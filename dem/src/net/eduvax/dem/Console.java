@@ -8,7 +8,7 @@ import java.io.PrintStream;
 public class Console {
 	private PrintStream _out;
 	private BufferedReader _in;
-	private String _prompt="> ";
+	private String _prompt="dem> ";
 	public Console() {
 		_out=System.out;
 		_in=new BufferedReader(new InputStreamReader(System.in));

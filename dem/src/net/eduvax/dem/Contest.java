@@ -1,11 +1,12 @@
 package net.eduvax.dem;
 
-import java.util.Vector;
-
-
-public class Contest {
+public class Contest extends NamedVector <DiveSheet> {
 	private Diver.Genre _genre;
 	private Rules _rules;
-	private Contest _overClass=null;
-	private Vector<DiveSheet> _sheets;
+// TODO à voir si ça vaut le coup...
+//	private Contest _overClass=null;
+
+    public Contest(String name) {
+        super(name);
+    }
 }

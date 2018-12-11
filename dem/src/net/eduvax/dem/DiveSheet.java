@@ -1,11 +1,40 @@
 package net.eduvax.dem;
 
 import java.lang.StringBuffer;
-import java.util.Vector;
+import java.util.Comparator;
 
-public class DiveSheet {
+public class DiveSheet extends NamedVector<Dive> {
+
+    public static class Comp implements Comparator<DiveSheet> {
+        public int compare(DiveSheet ds1, DiveSheet ds2) {
+            int res=0;
+            if (ds1.size() < ds2.size()) {
+                res=-1;
+            }
+            else if (ds1.size() > ds2.size()) {
+                res=1;
+            }
+            else {
+                if (ds1.getScore() < ds2.getScore()) {
+                    res=-1;
+                }
+                else if (ds1.getScore() > ds2.getScore()) {
+                    res=1;
+                }
+            }
+            return res;
+        }
+    }
+
 	private Diver _diver;
-	private Vector<Dive> _dives;
+
+    public DiveSheet(Diver diver) {
+        super(diver.getName());
+        _diver=diver;
+    }
+    
+/*
+ *  TODO à revoir...
 	private Vector<Rules> _rules;
 
 	public boolean check() {
@@ -15,20 +44,25 @@ public class DiveSheet {
 		}
 		return res;
 	}
-
+ */
 	public double getScore() {
 		double res=0;
-		for (int i=0;i<_dives.size();i++) {
-			res+=_dives.elementAt(i).getTotal();
+		for (Dive d: this) {
+			res+=d.getTotal();
 		}
 		return res;
 	}
 
 	public String toString() {
 		StringBuffer str=new StringBuffer();
-		for (int i=0;i<_dives.size();i++) {
-			str.append(_dives.toString()+"\n");
+        str.append(getName()+":");
+		for (Dive d: this) {
+			str.append(d.toString()+"\n");
 		}
 		return str.toString();
 	}
+
+    public Diver getDiver() {
+        return _diver;
+    }
 }

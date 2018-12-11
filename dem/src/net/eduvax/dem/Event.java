@@ -1,10 +1,18 @@
 package net.eduvax.dem;
 
 import java.util.Date;
-import java.util.Vector;
 
-public class Event {
-	private String _name;
+public class Event extends NamedVector<Session> {
 	private Date _date;
-	private Vector<Session> _session;
+	public Event(String name) {
+		super(name);
+        _date=new Date();
+	}
+    public Event(String name,Date date) {
+        super(name);
+        _date=date;
+    }
+    public Date getDate() {
+        return _date;
+    }
 }
