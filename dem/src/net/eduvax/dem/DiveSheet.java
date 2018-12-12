@@ -32,6 +32,15 @@ public class DiveSheet extends NamedVector<Dive> {
         super(diver.getName());
         _diver=diver;
     }
+
+    private int _height=0;
+
+    public int getHeight() {
+        return _height;
+    }
+    public void setHeight(int h) {
+        _height=h;
+    }
     
 /*
  *  TODO à revoir...

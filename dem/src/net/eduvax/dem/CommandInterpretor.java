@@ -226,28 +226,52 @@ return this;
                 public Contest getCtnr() {
                     return _state._contest;
                 }
+                private boolean isInteger(String str) {
+                    boolean res=str.length()>0;
+                    int i=0;
+                    while (res && i<str.length()) {
+                        char c=str.charAt(i);
+                        res&= c>='0' && c<='9';
+                        i++;
+                    }
+                    return res;
+                }
                 public DiveSheet newElem(Command cmd) {
                     String name=cmd.nextArg();
-                    int year=Integer.parseInt(cmd.nextArg());
+                    String ystr=cmd.nextArg();
+                    while (ystr!=null && !isInteger(ystr)) {
+                        name=name+" "+ystr;
+                        ystr=cmd.nextArg();
+                    }
+                    int year=Integer.parseInt(ystr);
                     String club=cmd.nextArg();
                     Diver.Genre genre=cmd.nextArg().toUpperCase().charAt(0)>='H'?Diver.Genre.MALE:Diver.Genre.FEMAL;
                     Diver diver=new Diver(name,year,club,genre);
                     DiveSheet ds=new DiveSheet(diver);
                     _state._diveSheet=ds;
+                    String h=cmd.nextArg();
+                    if (h!=null) {
+                        ds.setHeight(Integer.parseInt(h));
+                    }
                     return ds;
                 }
             }));
         _cmd.add(new Command("aDive") {
                 public void run() {
-                    String code=nextArg();
-                    double dd=Double.parseDouble(nextArg());
-                    String s=nextArg();
-                    int height=-1;
-                    if (s!=null) {
-                        height=Integer.parseInt(s);
+                    String a=nextArg();
+                    int h=_state._diveSheet.getHeight();
+                    while (a!=null) {
+                        String code=a;
+                        a=nextArg();
+                        double dd=0;
+                        if (a!=null && a.charAt(1)=='.') {
+                            dd=Double.parseDouble(a);
+                            a=nextArg();
+                        }
+                        // TODO add something to optionnaly take height (for platform)
+                        Dive dive=new Dive(code,dd,h);
+                        _state._diveSheet.add(dive); 
                     }
-                    Dive dive=new Dive(code,dd);
-                    _state._diveSheet.add(dive); 
                 }
             });
         _cmd.add(new Command("start") {
@@ -287,8 +311,12 @@ return this;
         _cmd.add(new Command("fd") {
                 public void run() {
                     String code=nextArg();
-                    double dd=Double.parseDouble(nextArg());
-                    Dive dive=new Dive(code,dd);
+                    String a=nextArg();
+                    double dd=0;
+                    if (a!=null) {
+                        dd=Double.parseDouble(a);
+                    }
+                    Dive dive=new Dive(code,dd,_state._diveSheet.getHeight());
                     _state._diveSheet.set(_state._round,dive);
                     _state._dive=dive;
                     _state.showCurrent();

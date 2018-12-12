@@ -95,18 +95,26 @@ public class Dive implements INamedObject {
 	private double _total=-1;
     private double _sum=0;
 
-	public Dive(String code,double diff) {
+	public Dive(String code,double diff,int h) {
 		_code=code;
 		_diff=diff;
-System.out.print(">>> "+code);
-double dd=getDD(0);
-System.out.print("  \t"+diff+" / "+dd+" ");
-if (dd!=diff) {
-System.out.println("KO !!!!!!!!!!");
-}
-else {
-System.out.println("OK");
-}
+        int hIdx=0;
+        if (h==3 || h==7) {
+            hIdx=1;
+        }
+        else if (h==10) {
+            hIdx=2;
+        }
+        if (_diff==0) {
+            _diff=getDD(hIdx);
+        }
+        else {
+            double dd=getDD(hIdx);
+            if (_diff!=dd) {
+                System.out.println("Check DD for "+code
+                    +" "+_diff+" / "+dd+"(C)");
+            }
+        }
         _score=new Vector<Double>();
 	}
 	public int getSens() {
