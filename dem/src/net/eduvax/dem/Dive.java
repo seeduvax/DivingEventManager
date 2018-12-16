@@ -99,7 +99,7 @@ public class Dive implements INamedObject {
 		_code=code;
 		_diff=diff;
         int hIdx=0;
-        if (h==3 || h==7) {
+        if (h==3 || ( h>=7 && h<=8)) {
             hIdx=1;
         }
         else if (h==10) {
@@ -151,9 +151,19 @@ public class Dive implements INamedObject {
     public double getDD(int high) {
         int layout=getLayout();
         int ssault=getSomersault();
-        int tw=getTwist();
-        int iSS=_iSS[ssault];
         int sens=getSens();
+        int tw=getTwist();
+        if (
+               layout<0
+            || layout>4
+            || ssault<0
+            || ssault>9
+            || sens<0
+            || sens>3
+                ) {
+            return 0.0;
+        }
+        int iSS=_iSS[ssault];
         double pA=_vSS[high][ssault];
         double pB=+_vPos[layout][iSS][isArmstand()?4:sens] 
                     +(isFlying()?_vPos[4][iSS][layout]:0);
