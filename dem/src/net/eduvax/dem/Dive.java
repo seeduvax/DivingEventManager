@@ -160,6 +160,8 @@ public class Dive implements INamedObject {
             || ssault>9
             || sens<0
             || sens>3
+            || tw<0
+            || tw>9
                 ) {
             return 0.0;
         }
