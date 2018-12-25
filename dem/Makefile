@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------
-# ABS bootstrap make file.
-# $Rev: 6943 $
-# (c) ArianeGroup 2017
+# AcrobatomaticBuildSystem bootstrap make file.
+# (c) 2006-2019 Sebastien Devaux
+# (c) 2017-2019 ArianeGroup 
 #
 # To use ABS to build your project, just copy this file as 'Makefile' into
 # your project's root directory and each already existing module directories.
@@ -14,8 +14,8 @@
 # Any GNU environment (GNU/Linux, cygwin, mingw, may be GNU/hurd) should
 # be able to run this makefile.
 # ---------------------------------------------------------------------
-# See ABS documentation (ref RD_TEA332-1593) for more details.
-# https://pforgerle.public.infrapub.fr.st.space.corp/confluence/display/rdtea332/BuildScripts
+# See ABS documentation (ref #5b53baa) for more details.
+# https://www.eduvax.net/gitweb
 # ---------------------------------------------------------------------
 
 ifneq ($(wildcard app.cfg),)
@@ -24,24 +24,43 @@ endif
 ifneq ($(wildcard module.cfg),)
 PRJROOT:=$(shell dirname $(CURDIR))
 endif
+ABS_CACHE:=$(PRJROOT)/../abs-cache
 
 include $(PRJROOT)/app.cfg
 include $(PRJROOT)/.abs/core/main.mk
 
-ifeq ($(findstring file://,$(ABS_REPO)),file://)
-$(PRJROOT)/.abs/%/main.mk:
-	@echo Fetching abs $(patsubst $(PRJROOT)/.abs/%/main.mk,%,$@) from $(ABS_REPO)
-	@mkdir -p $(PRJROOT)/.abs
-	@tar xzf $(patsubst file://%,%,$(patsubst $(PRJROOT)/.abs/%/main.mk,$(ABS_REPO)/noarch/abs.%-$(VABS).tar.gz,$@)) -C $(PRJROOT)/.abs --strip-components=1
-	@touch $@
-
+# Default and minimal rule download files from repository
+# May be overloaded by dependencies download rules for more features
+ifeq ($(ABS_DEPDOWNLOAD_RULE_OVERLOADED),)
+ABS_REPO_1ST=$(word 1,$(ABS_REPO))
+$(ABS_CACHE)/%:
+	@mkdir -p $(@D)
+ifeq ($(findstring file://,$(ABS_REPO_1ST)),file://)
+	@test -r $(patsubst file://%,%,$(patsubst $(ABS_CACHE)/%,$(ABS_REPO_1ST)/%,$@)) || exit 1
+	@echo "Linking $(@F) from $(ABS_REPO_1ST)"
+	@ln -sf $(patsubst file://%,%,$(patsubst $(ABS_CACHE)/%,$(ABS_REPO_1ST)/%,$@)) $@
 else
-$(PRJROOT)/.abs/%/main.mk:
-	@echo Fetching abs $(patsubst $(PRJROOT)/.abs/%/main.mk,%,$@) from $(ABS_REPO)
-	@mkdir -p $(PRJROOT)/.abs
-	@wget -q --no-check-certificate $(patsubst $(PRJROOT)/.abs/%/main.mk,$(ABS_REPO)/noarch/abs.%-$(VABS).tar.gz,$@) -O - | tar xzf - -C $(PRJROOT)/.abs --strip-components=1
-	@touch $@
-
+	@echo "Fetching $(@F) from $(ABS_REPO_1ST)"
+	@wget -q --no-check-certificate $(patsubst $(ABS_CACHE)/%,$(ABS_REPO_1ST)/%,$@) -O $@
+endif
 endif
 
-ABS_PRINT:=$(PRJROOT)/.abs/core/abs_print.sh
+$(PRJROOT)/.abs/%/main.mk: $(ABS_CACHE)/noarch/abs.%-$(VABS).tar.gz
+	@mkdir -p .abs
+	@tar xzf $^ -C $(PRJROOT)/.abs --strip-components=1
+	@touch $@
+
+$(PRJROOT)/local.cfg:
+
+# update module bootstrap makefile from project app level bootstrap makefile
+ifneq ($(wildcard module.cfg),)
+Makefile: ../Makefile
+	@echo Updating module bootstrap makefile from parent directory
+	@cp $^ $@
+endif
+# update app bootstrap makefile from bootstrap makefile in abs core
+ifneq ($(wildcard app.cfg),)
+Makefile: .abs/core/bootstrap.mk
+	@echo Updating app bootstrap makefile from abs core
+	@cp $^ $@
+endif
