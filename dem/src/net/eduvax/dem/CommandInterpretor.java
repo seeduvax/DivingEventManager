@@ -4,60 +4,28 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import net.eduvax.dem.www.WebServer;
 
-class CommandInterpretor {
-    class UIState {
-	    Event _event=null;
+public class CommandInterpretor {
+    private static WebServer _webServer=null;
+    public class UIState {
         Session _session=null;
-        Contest _contest=null;
         DiveSheet _diveSheet=null;
         Dive _dive=null;
-        boolean _completed=false;
         Enumeration<DiveSheet> _sheetEnum=null;
         int _round=0;
         
-        void start() {
-            _sheetEnum=_contest.elements();
-            _diveSheet=_sheetEnum.nextElement();
-            _round=0;
-            _dive=_diveSheet.elementAt(_round);
-            _completed=false;
-        }
-
-        void next() {
-            boolean loop=false;
-            _dive=null;
-            while (_dive==null&&!_completed) {
-                if (!_sheetEnum.hasMoreElements()) {
-                    _round++;
-                    if (!loop) {
-                        _sheetEnum=_contest.elements();
-                        loop=true;
-                    }
-                    else {
-                        _completed=true;
-                    }
-                }
-                if (!_completed) {
-                    _diveSheet=_sheetEnum.nextElement();
-                    if (_diveSheet.size()>_round) {
-                        _dive=_diveSheet.elementAt(_round);
-                    }
-                }
-            }
-            if (_completed) {
-                System.out.println("Completed !!!");
-            }
-        }
 
         void showCurrent() {
-            if (!_completed) {
-                System.out.println("Round: "+(_round+1));
-                System.out.println(" "+_diveSheet.getDiver()+" "+str2digit(_diveSheet.getScore()));
-                System.out.println(" "+_dive.getName()+" ["+_dive.getDD()+"]");
+            if (!_session.isCompleted()) {
+                System.out.println("Round: "+(_session.getRound()+1));
+                DiveSheet sheet=_session.getCurrentSheet();
+                System.out.println(" "+sheet.getDiver()+" "+str2digit(sheet.getScore()));
+                Dive dive=_session.getCurrentDive();
+                System.out.println(" "+dive.getName()+" ["+dive.getDD()+"]");
             }
             else {
-                Vector<DiveSheet> v=new Vector<DiveSheet>(_contest);
+                Vector<DiveSheet> v=new Vector<DiveSheet>(_session);
                 Collections.sort(v,new DiveSheet.Comp());
                 int j=0;
                 System.out.println("---------------------------------");
@@ -124,7 +92,7 @@ return this;
             Command res=null;
             if (match(s)) {
                 res=get();
-                res._argST=new StringTokenizer(s);
+                res._argST=new StringTokenizer(s," \t");
                 if (s.startsWith(_name)) {
                     // for d command that is a special case
                     // first word may be first arg.
@@ -176,55 +144,15 @@ return this;
             }
         }
     }
-	public class CEv extends Command {
-		private String _evName;
-        public CEv() {
-            super("cEvent");
-        }
-		public ICommand get(String s) {
-			CEv cev=null;
-			if (s.startsWith("cEvent ")) {
-				cev=new CEv();
-				cev._evName=s.substring(7);
-			}
-			return cev;
-		}
-		public void run() {
-			_state._event=new Event(_evName);
-			System.out.println("Event "+_evName+" ready.");
-		}
-	}
-	private boolean _completed=false;
+    private boolean _completed=false;
 	private Vector<ICommand> _cmd;
 	public CommandInterpretor() {
+        _state._session=new Session("");
 		_cmd=new Vector<ICommand>();
-		_cmd.add(new CEv());
-        _cmd.add(new CNamedVectEntry<Event,Session>("cSession",
-            new Fact<Event,Session>() {
-                public Event getCtnr() {
-                    return _state._event;
-                }
-                public Session newElem(Command c) {
-                    Session s=new Session(c.nextArg());
-                    _state._session=s;
-                    return s;
-                }
-            }));
-        _cmd.add(new CNamedVectEntry<Session,Contest>("cContest",
-            new Fact<Session,Contest>() {
+        _cmd.add(new CNamedVectEntry<Session,DiveSheet>("cSheet",
+            new Fact<Session,DiveSheet>() {
                 public Session getCtnr() {
                     return _state._session;
-                }
-                public Contest newElem(Command cmd) {
-                    Contest c=new Contest(cmd.nextArg());
-                    _state._contest=c;
-                    return c;
-                }
-            }));
-        _cmd.add(new CNamedVectEntry<Contest,DiveSheet>("cSheet",
-            new Fact<Contest,DiveSheet>() {
-                public Contest getCtnr() {
-                    return _state._contest;
                 }
                 private boolean isInteger(String str) {
                     boolean res=str.length()>0;
@@ -277,7 +205,7 @@ return this;
         _cmd.add(new Command("start") {
                 public void run() {
                     System.out.println("Starting current session: "+_state._session);
-                    _state.start();
+                    _state._session.start();
                     _state.showCurrent();
                 }
             });
@@ -287,7 +215,7 @@ return this;
                         return true;
                     }
                     try {
-                        StringTokenizer st=new StringTokenizer(s," ");
+                        StringTokenizer st=new StringTokenizer(s," \t");
                         double d=Double.parseDouble(st.nextToken());
                         return true;
                     }
@@ -296,16 +224,17 @@ return this;
                     }
                 }
                 public void run() {
-                    _state._dive.resetScore();
+                    Dive dive=_state._session.getCurrentDive();
+                    dive.resetScore();
                     String arg=nextArg();
                     while (arg!=null) {
-                        _state._dive.addScore(Double.parseDouble(arg));
+                        dive.addScore(Double.parseDouble(arg));
                         arg=nextArg();
                     }
                     System.out.println(" Score: "
-                                +_state.str2digit(_state._dive.getSum())+" ["
-                                +_state.str2digit(_state._dive.getTotal())
-                                +"], total="+_state.str2digit(_state._diveSheet.getScore()));
+                                +_state.str2digit(dive.getSum())+" ["
+                                +_state.str2digit(dive.getTotal())
+                                +"], total="+_state.str2digit(_state._session.getCurrentSheet().getScore()));
                 }
             });
         _cmd.add(new Command("fd") {
@@ -324,9 +253,37 @@ return this;
             });
         _cmd.add(new Command("n") {
                 public void run() {
-                    _state.next();
+                    _state._session.next();
                     System.out.println();
                     _state.showCurrent();
+                }
+            });
+        _cmd.add(new Command("wstart") {
+                public void run() {
+                    if (_webServer==null) {
+                        try {
+                            _webServer=new WebServer(8080,_state._session);
+                            _webServer.start();
+                        }
+                        catch (Exception ex) {
+                            System.err.println("Can't start web server");
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            });
+        _cmd.add(new Command("wstop") {
+                public void run() {
+                    if (_webServer!=null) {
+                        try {
+                            _webServer.stop();
+                            _webServer.join();
+                        }
+                        catch (Exception ex) {
+                            System.err.println("Can't stop web server");
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             });
 	}

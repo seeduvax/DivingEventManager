@@ -55,9 +55,16 @@ public class DiveSheet extends NamedVector<Dive> {
 	}
  */
 	public double getScore() {
+        return getScore(size());
+	}
+	public double getScore(int count) {
 		double res=0;
+        int i=0;
 		for (Dive d: this) {
-			res+=d.getTotal();
+            i++;
+            if (i<=count) {
+			    res+=d.getTotal();
+            }
 		}
 		return res;
 	}
