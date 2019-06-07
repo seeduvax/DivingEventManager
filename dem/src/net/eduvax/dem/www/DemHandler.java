@@ -57,8 +57,8 @@ public class DemHandler extends AbstractHandler {
         return res;
     }
     public String diveSheetToJson(DiveSheet sheet) {
-        String res="{'diver':'"+sheet.getDiver()
-            +"','dives':[";
+        String res="{\"diver\":\""+sheet.getDiver()
+            +"\",\"dives\":[";
         Enumeration<Dive> dives=sheet.elements();
         while (dives.hasMoreElements()) {
             res+=diveToJson(dives.nextElement());
@@ -70,11 +70,11 @@ public class DemHandler extends AbstractHandler {
         return res;
     }
     public String diveToJson(Dive d) {
-        String res="{'dive':'"+d.getName()
-            +"','dd':"+d.getDD()
-            +"','sum':"+d.getSum()
-            +"','total':"+d.getTotal()
-            +"','score':[";
+        String res="{\"dive\":\""+d.getName()
+            +"\",\"dd\":"+d.getDD()
+            +",\"sum\":"+d.getSum()
+            +",\"total\":"+d.getTotal()
+            +",\"score\":[";
         double[] score=d.getScore();
         for (int i=0;i<score.length;i++) {
             res+=score[i];

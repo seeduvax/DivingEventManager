@@ -6,9 +6,37 @@
 <div class="head">
 <h1 id="eventName">Diving Event Manager</h1>
 </div>
-<div class="board">
+<div class="board" id="board">
 </div>
 <div class="foot">
 </div>
 </body>
+<script>
+function refreshSessionStatus() {
+	var xhr=new XMLHttpRequest();
+	xhr.open("GET","sessionInfo",true);
+	xhr.send();
+	xhr.onreadystatechange=function() {
+		var s='<table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
+		if (this.readyState==4 && this.status==200) {
+			var data=JSON.parse(this.responseText);
+			for (i=0;i<data.length;i++) {
+				s+="<tr><td>"+data[i].diver
+					+"</td></tr>";
+				for (j=0;j<data[i].dives.length;j++) {
+					s+="<tr><td>"
+					+data[i].dives[j].dive+" "
+					+data[i].dives[j].dd+"</td><td>"
+					+data[i].dives[j].sum+"</td><td> "
+					+data[i].dives[j].total+"</td></tr>"
+					
+				}
+			}
+			s+="</table>"
+			document.getElementById("board").innerHTML=s;
+		}
+	}
+}
+refreshSessionStatus();
+</script>
 </html>
