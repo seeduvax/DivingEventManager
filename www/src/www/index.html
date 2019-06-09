@@ -17,18 +17,20 @@ function refreshSessionStatus() {
 	xhr.open("GET","sessionInfo",true);
 	xhr.send();
 	xhr.onreadystatechange=function() {
-		var s='<table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
 		if (this.readyState==4 && this.status==200) {
 			var data=JSON.parse(this.responseText);
-			for (i=0;i<data.length;i++) {
-				s+="<tr><td>"+data[i].diver
-					+"</td></tr>";
-				for (j=0;j<data[i].dives.length;j++) {
+		    var s="<p>Round: "+data.round
+                +'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
+			for (i=0;i<data.sheets.length;i++) {
+				s+="<tr><td>"+data.sheets[i].diver
+					+"</td><td>"+data.sheets[i].score
+                    +"</td></tr>";
+				for (j=0;j<data.sheets[i].dives.length;j++) {
 					s+="<tr><td>"
-					+data[i].dives[j].dive+" "
-					+data[i].dives[j].dd+"</td><td>"
-					+data[i].dives[j].sum+"</td><td> "
-					+data[i].dives[j].total+"</td></tr>"
+					+data.sheets[i].dives[j].dive+" "
+					+data.sheets[i].dives[j].dd+"</td><td>"
+					+data.sheets[i].dives[j].sum+"</td><td> "
+					+data.sheets[i].dives[j].total+"</td></tr>"
 					
 				}
 			}

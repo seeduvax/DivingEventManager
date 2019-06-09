@@ -11,16 +11,14 @@ public class CommandInterpretor {
     public class UIState {
         Session _session=null;
         DiveSheet _diveSheet=null;
-        Dive _dive=null;
         Enumeration<DiveSheet> _sheetEnum=null;
-        int _round=0;
-        
 
         void showCurrent() {
             if (!_session.isCompleted()) {
                 System.out.println("Round: "+(_session.getRound()+1));
                 DiveSheet sheet=_session.getCurrentSheet();
-                System.out.println(" "+sheet.getDiver()+" "+str2digit(sheet.getScore()));
+                System.out.println(" "+sheet.getDiver()+" "
+                    +Session.str2digit(sheet.getScore()));
                 Dive dive=_session.getCurrentDive();
                 System.out.println(" "+dive.getName()+" ["+dive.getDD()+"]");
             }
@@ -39,18 +37,13 @@ public class CommandInterpretor {
                     else {
                         j++;
                     }
-                    System.out.println(""+j+": "+ds.getDiver()+"\t: "+str2digit(ds.getScore()));
+                    System.out.println(""+j+": "+ds.getDiver()+"\t: "
+                        +Session.str2digit(ds.getScore()));
                 }
             }
         }
-        public String str2digit(double d) {
-            return String.format("%1$.2f",Math.rint(d*100)/100);
-        }
     }
     private UIState _state=new UIState();
-    public int getRound() {
-        return _state._round;
-    }
 
 	public interface ICommand extends Runnable {
 		ICommand get(String str);
@@ -232,9 +225,9 @@ return this;
                         arg=nextArg();
                     }
                     System.out.println(" Score: "
-                                +_state.str2digit(dive.getSum())+" ["
-                                +_state.str2digit(dive.getTotal())
-                                +"], total="+_state.str2digit(_state._session.getCurrentSheet().getScore()));
+                                +Session.str2digit(dive.getSum())+" ["
+                                +Session.str2digit(dive.getTotal())
+                                +"], total="+Session.str2digit(_state._session.getCurrentSheet().getScore()));
                 }
             });
         _cmd.add(new Command("fd") {
@@ -245,9 +238,8 @@ return this;
                     if (a!=null) {
                         dd=Double.parseDouble(a);
                     }
-                    Dive dive=new Dive(code,dd,_state._diveSheet.getHeight());
-                    _state._diveSheet.set(_state._round,dive);
-                    _state._dive=dive;
+                    _state._session.setCurrentDive( new Dive(code,dd,
+                          _state._session.getCurrentSheet().getHeight()));
                     _state.showCurrent();
                 }
             });
@@ -305,7 +297,10 @@ return this;
         }
 		return res;
 	}
-	boolean completed() {
+	public boolean completed() {
 		return _completed;
 	}
+    public int getRound() {
+        return _state._session.getRound();
+    } 
 }

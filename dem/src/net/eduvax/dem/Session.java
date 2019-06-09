@@ -1,7 +1,7 @@
 package net.eduvax.dem;
 
 import java.util.Enumeration;
-
+import java.util.Locale;
 
 public class Session extends NamedVector <DiveSheet> {
     public Session(String name) {
@@ -57,5 +57,15 @@ public class Session extends NamedVector <DiveSheet> {
     }
     public boolean isCompleted() {
         return _completed;
+    }
+    public static String str2digit(double d) {
+        return String.format("%1$.2f",Math.rint(d*100)/100);
+    }
+    public static String str2digit(double d, Locale l) {
+        return String.format(l,"%1$.2f",Math.rint(d*100)/100);
+    }
+    public void setCurrentDive(Dive d) {
+        _cDive=d;
+        _cSheet.set(_round,d);
     }
 }

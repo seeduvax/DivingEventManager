@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import net.eduvax.dem.Session;
 import net.eduvax.dem.DiveSheet;
@@ -45,7 +46,8 @@ public class DemHandler extends AbstractHandler {
         }
     }
     public String sessionToJson(Session s) {
-        String res="[";
+        String res="{\"round\":"+s.getRound()
+            +",\"sheets\":[";
         Enumeration<DiveSheet> sheets=s.elements();
         while (sheets.hasMoreElements()) {
             res+=diveSheetToJson(sheets.nextElement());
@@ -53,12 +55,13 @@ public class DemHandler extends AbstractHandler {
                 res+=",";
             }
         }
-        res+="]";
+        res+="]}";
         return res;
     }
     public String diveSheetToJson(DiveSheet sheet) {
         String res="{\"diver\":\""+sheet.getDiver()
-            +"\",\"dives\":[";
+            +"\",\"score\":"+Session.str2digit(sheet.getScore(),Locale.US)
+            +",\"dives\":[";
         Enumeration<Dive> dives=sheet.elements();
         while (dives.hasMoreElements()) {
             res+=diveToJson(dives.nextElement());
@@ -72,12 +75,13 @@ public class DemHandler extends AbstractHandler {
     public String diveToJson(Dive d) {
         String res="{\"dive\":\""+d.getName()
             +"\",\"dd\":"+d.getDD()
-            +",\"sum\":"+d.getSum()
-            +",\"total\":"+d.getTotal()
+            +",\"sum\":"+Session.str2digit(d.getSum(),Locale.US)
+            +",\"total\":"+Session.str2digit(d.getTotal(),Locale.US)
+            +",\"current\":"+(d==_session.getCurrentDive()?"true":"false")
             +",\"score\":[";
         double[] score=d.getScore();
         for (int i=0;i<score.length;i++) {
-            res+=score[i];
+            res+=Session.str2digit(score[i],Locale.US);
             if (i<score.length-1) {
                 res+=",";
             }
