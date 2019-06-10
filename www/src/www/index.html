@@ -12,33 +12,37 @@
 </div>
 </body>
 <script>
-function refreshSessionStatus() {
+var sessionInfo={}
+function scoreBoard() {
+    var s="<p>Round: "+sessionInfo.round
+	+'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
+		for (i=0;i<sessionInfo.sheets.length;i++) {
+			s+="<tr><td>"+sessionInfo.sheets[i].diver
+				+"</td><td>"+sessionInfo.sheets[i].score
+		   		+"</td></tr>";
+			for (j=0;j<sessionInfo.sheets[i].dives.length;j++) {
+				s+="<tr><td>"
+				+sessionInfo.sheets[i].dives[j].dive+" "
+				+sessionInfo.sheets[i].dives[j].dd+"</td><td>"
+				+sessionInfo.sheets[i].dives[j].sum+"</td><td> "
+				+sessionInfo.sheets[i].dives[j].total+"</td></tr>"
+			}
+		}
+		s+="</table>"
+		document.getElementById("board").innerHTML=s;
+}
+function refreshSessionInfo() {
 	var xhr=new XMLHttpRequest();
 	xhr.open("GET","sessionInfo",true);
 	xhr.send();
 	xhr.onreadystatechange=function() {
 		if (this.readyState==4 && this.status==200) {
-			var data=JSON.parse(this.responseText);
-		    var s="<p>Round: "+data.round
-                +'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
-			for (i=0;i<data.sheets.length;i++) {
-				s+="<tr><td>"+data.sheets[i].diver
-					+"</td><td>"+data.sheets[i].score
-                    +"</td></tr>";
-				for (j=0;j<data.sheets[i].dives.length;j++) {
-					s+="<tr><td>"
-					+data.sheets[i].dives[j].dive+" "
-					+data.sheets[i].dives[j].dd+"</td><td>"
-					+data.sheets[i].dives[j].sum+"</td><td> "
-					+data.sheets[i].dives[j].total+"</td></tr>"
-					
-				}
-			}
-			s+="</table>"
-			document.getElementById("board").innerHTML=s;
+			sessionInfo=JSON.parse(this.responseText);
+			scoreBoard();
 		}
 	}
 }
-refreshSessionStatus();
+
+window.setInterval(refreshSessionInfo,1000);
 </script>
 </html>

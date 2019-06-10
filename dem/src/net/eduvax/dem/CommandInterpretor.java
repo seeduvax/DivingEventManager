@@ -126,6 +126,7 @@ return this;
                 U elem=newElem();
                 if (elem!=null) {
                     container.add(elem);
+                    _state._session.notifyChange();
                     System.out.println("Done "+getName());
                 }
                 else {
@@ -193,6 +194,7 @@ return this;
                         Dive dive=new Dive(code,dd,h);
                         _state._diveSheet.add(dive); 
                     }
+                    _state._session.notifyChange();
                 }
             });
         _cmd.add(new Command("start") {
@@ -200,6 +202,7 @@ return this;
                     System.out.println("Starting current session: "+_state._session);
                     _state._session.start();
                     _state.showCurrent();
+                    _state._session.notifyChange();
                 }
             });
         _cmd.add(new Command("d") {
@@ -228,6 +231,7 @@ return this;
                                 +Session.str2digit(dive.getSum())+" ["
                                 +Session.str2digit(dive.getTotal())
                                 +"], total="+Session.str2digit(_state._session.getCurrentSheet().getScore()));
+                    _state._session.notifyChange();
                 }
             });
         _cmd.add(new Command("fd") {
@@ -248,6 +252,7 @@ return this;
                     _state._session.next();
                     System.out.println();
                     _state.showCurrent();
+                    _state._session.notifyChange();
                 }
             });
         _cmd.add(new Command("wstart") {

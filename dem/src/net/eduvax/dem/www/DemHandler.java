@@ -27,10 +27,11 @@ import net.eduvax.dem.Dive;
 /**
  *
  */
-public class DemHandler extends AbstractHandler {
+public class DemHandler extends AbstractHandler implements Session.Observer {
     public DemHandler(Session session) {
         _session=session;
         _sessionJson=sessionToJson(session);
+        _session.addObserver(this);
     }
     public void handle(String target,
                     Request baseRequest,
@@ -41,7 +42,9 @@ public class DemHandler extends AbstractHandler {
             response.setContentType("text/json; charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
             PrintWriter out=response.getWriter();
-            out.println(_sessionJson);
+            synchronized(this) {
+                out.println(_sessionJson);
+            }
             baseRequest.setHandled(true);
         }
     }
@@ -88,6 +91,13 @@ public class DemHandler extends AbstractHandler {
         }
         res+="]}";
         return res;
+    }
+    public void update(Session src) {
+        if (src==_session) {
+            synchronized(this) {
+                _sessionJson=sessionToJson(_session);
+            }
+        }
     }
     private Session _session; 
     private String _sessionJson;

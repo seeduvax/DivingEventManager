@@ -2,8 +2,12 @@ package net.eduvax.dem;
 
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Vector;
 
 public class Session extends NamedVector <DiveSheet> {
+    public interface Observer {
+        void update(Session src);
+    }
     public Session(String name) {
         super(name);
     }
@@ -12,6 +16,7 @@ public class Session extends NamedVector <DiveSheet> {
     private Enumeration<DiveSheet> _sheetEnum=null;
     private boolean _completed=false;
     private Dive _cDive;
+    private Vector<Observer> _observers=new Vector<Observer>();
 
     public void start() {
         _round=0;
@@ -67,5 +72,13 @@ public class Session extends NamedVector <DiveSheet> {
     public void setCurrentDive(Dive d) {
         _cDive=d;
         _cSheet.set(_round,d);
+    }
+    public void addObserver(Observer o) {
+        _observers.addElement(o);
+    }
+    public void notifyChange() {
+        for (Observer o: _observers) {
+            o.update(this);
+        }
     }
 }
