@@ -8,28 +8,73 @@
 </div>
 <div class="board" id="board">
 </div>
+<div class="board" id="detail">
+</div>
 <div class="foot">
 </div>
 </body>
 <script>
 var sessionInfo={}
 function scoreBoard() {
-    var s="<p>Round: "+sessionInfo.round
-	+'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
-		for (i=0;i<sessionInfo.sheets.length;i++) {
-			s+="<tr><td>"+sessionInfo.sheets[i].diver
-				+"</td><td>"+sessionInfo.sheets[i].score
-		   		+"</td></tr>";
-			for (j=0;j<sessionInfo.sheets[i].dives.length;j++) {
-				s+="<tr><td>"
-				+sessionInfo.sheets[i].dives[j].dive+" "
-				+sessionInfo.sheets[i].dives[j].dd+"</td><td>"
-				+sessionInfo.sheets[i].dives[j].sum+"</td><td> "
-				+sessionInfo.sheets[i].dives[j].total+"</td></tr>"
-			}
+	var c="";
+	var s="<p>Round: "+(sessionInfo.round+1)
+		+'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
+	for (i=0;i<sessionInfo.sheets.length;i++) {
+		var sheet=sessionInfo.sheets[i];
+		s+='<tr><td><a href="#" onclick="diverSheet('+i+')">'
+			+sheet.diver
+			+"</a></td><td>"+sheet.score
+			+"</td></tr>";
+		for (d=0;d<sheet.dives.length;d++) {
+			var dive=sheet.dives[d];
+			if (dive.current) {
+				c="<table><tr><th>Dive</th><th>DD</th>"
+				for (j=1;j<=dive.score.length;j++) {
+					c+="<th>J"+j+"</th>"
+				}
+				c+="<th>Sum</th><th>Dive Score</th><th>Total Score</th></tr>"
+				c+="<tr><td>"
+					+dive.dive+"</td><td>"
+					+dive.dd+"</td><td>";
+				for (k=0;k<dive.score.length;k++) {
+					c+=dive.score[k]+"</td><td>"
+				}
+				c+=dive.sum
+					+"</td><td>"+dive.total
+					+"</td><td>"+sheet.score
+					+"</td></tr>";
+					}
+				}
+				c+="</table>"
+	}
+	s+="</table>"+c;
+	document.getElementById("board").innerHTML=s;
+}
+function diverSheet(i) {
+	var sheet=sessionInfo.sheets[i];
+	var s="<p>"+sheet.diver+"</p>"
+		+"<table><tr><th>Dive</th><th>DD</th>"
+	for (j=1;j<=sheet.dives[0].score.length;j++) {
+		s+="<th>J"+j+"</th>"
+	}
+	s+="<th>Sum</th><th>Dive Score</th><th>Total Score</th></tr>"
+	var total=0;
+	for (j=0;j<sheet.dives.length;j++) {
+		var dive=sheet.dives[j];
+		s+="<tr><td>"
+			+dive.dive+"</td><td>"
+			+dive.dd+"</td><td>";
+		for (k=0;k<dive.score.length;k++) {
+			s+=dive.score[k]+"</td><td>"
 		}
-		s+="</table>"
-		document.getElementById("board").innerHTML=s;
+		total+=100*dive.total;
+		s+=dive.sum
+			+"</td><td>"+dive.total
+			+"</td><td>"+(total/100)
+			+"</td></tr>";
+	}
+	s+="</table>";
+	document.getElementById("detail").innerHTML=s;
 }
 function refreshSessionInfo() {
 	var xhr=new XMLHttpRequest();
