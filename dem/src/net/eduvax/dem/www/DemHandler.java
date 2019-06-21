@@ -47,6 +47,12 @@ public class DemHandler extends AbstractHandler implements Session.Observer {
             }
             baseRequest.setHandled(true);
         }
+        else if (target.startsWith("/J&")) {
+            System.out.println("send note "+target);
+        }
+        else if (target.startsWith("/next")) {
+            System.out.println("next "+target);
+        }
     }
     public String sessionToJson(Session s) {
         String res="{\"round\":"+s.getRound()

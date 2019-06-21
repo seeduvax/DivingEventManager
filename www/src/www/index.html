@@ -1,6 +1,12 @@
-<html>
-<head>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Diving event manager</title>
+<style type="text/css">
+@import url("./style.css");
+</style>
 </head>
 <body>
 <div class="head">
@@ -10,6 +16,10 @@
 </div>
 <div class="board" id="detail">
 </div>
+<div class="command">
+<input id="J" type="text" onkeyup="if (event.keyCode==13) J();"/>
+<a href="#" onclick="next()">Next</a>
+</div>
 <div class="foot">
 </div>
 </body>
@@ -17,23 +27,24 @@
 var sessionInfo={}
 function scoreBoard() {
 	var c="";
-	var s="<p>Round: "+(sessionInfo.round+1)
-		+'</p><table><tr><th>Diver</th><th colspan="9">Score</th></tr>'
+	var s='<table><tr><th>Diver</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>Score</th></tr>'
 	for (i=0;i<sessionInfo.sheets.length;i++) {
 		var sheet=sessionInfo.sheets[i];
-		s+='<tr><td><a href="#" onclick="diverSheet('+i+')">'
-			+sheet.diver
-			+"</a></td><td>"+sheet.score
-			+"</td></tr>";
+		var lineClass="odd";
+		if (i%2==0) {
+			lineClass="even";
+		}
+		var r="";
 		for (d=0;d<sheet.dives.length;d++) {
 			var dive=sheet.dives[d];
 			if (dive.current) {
+				lineClass="current"
 				c="<table><tr><th>Dive</th><th>DD</th>"
 				for (j=1;j<=dive.score.length;j++) {
 					c+="<th>J"+j+"</th>"
 				}
 				c+="<th>Sum</th><th>Dive Score</th><th>Total Score</th></tr>"
-				c+="<tr><td>"
+				c+='<tr class="even"><td>'
 					+dive.dive+"</td><td>"
 					+dive.dd+"</td><td>";
 				for (k=0;k<dive.score.length;k++) {
@@ -43,9 +54,23 @@ function scoreBoard() {
 					+"</td><td>"+dive.total
 					+"</td><td>"+sheet.score
 					+"</td></tr>";
-					}
-				}
-				c+="</table>"
+			}
+			if (d==sessionInfo.round) {
+				r+='<td class="current">'
+			}
+			else {
+				r+="<td>"
+			}
+			r+=dive.dive+"</td>";
+		}
+		s+='<tr class="'+lineClass+'"><td><a href="#" onclick="diverSheet('+i+')">'
+			+sheet.diver
+			+"</a></td>"+r;
+		for (d=sheet.dives.length;d<11;d++) {
+			s+="<td></td>";
+		}
+		c+="</table>"
+		s+="<td>"+sheet.score+"</td></tr>";
 	}
 	s+="</table>"+c;
 	document.getElementById("board").innerHTML=s;
@@ -79,13 +104,24 @@ function diverSheet(i) {
 function refreshSessionInfo() {
 	var xhr=new XMLHttpRequest();
 	xhr.open("GET","sessionInfo",true);
-	xhr.send();
 	xhr.onreadystatechange=function() {
 		if (this.readyState==4 && this.status==200) {
 			sessionInfo=JSON.parse(this.responseText);
 			scoreBoard();
 		}
 	}
+	xhr.send();
+}
+function J() {
+	var xhr=new XMLHttpRequest();
+	xhr.open("GET","J&"+document.getElementById("J").value,true);
+	xhr.send();
+}
+function next() {
+	var xhr=new XMLHttpRequest();
+	xhr.open("GET","next",true);
+	xhr.send();
+	document.getElementById("J").value="";
 }
 
 window.setInterval(refreshSessionInfo,1000);
