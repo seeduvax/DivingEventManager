@@ -17,14 +17,15 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import java.io.File;
 import net.eduvax.dem.Session;
+import net.eduvax.dem.Console;
 
 /**
  *
  */
 public class WebServer {
-    public WebServer(int port,Session session) throws Exception {
+    public WebServer(int port,Console console,Session session) throws Exception {
         _server=new Server(port);
-        DemHandler dh=new DemHandler(session);
+        DemHandler dh=new DemHandler(console,session);
         ResourceHandler fileServer = new ResourceHandler();
         fileServer.setDirectoriesListed(true);
         fileServer.setWelcomeFiles(new String[]{ "index.html" });

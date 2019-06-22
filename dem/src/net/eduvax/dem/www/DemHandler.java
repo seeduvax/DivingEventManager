@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import net.eduvax.dem.Session;
+import net.eduvax.dem.Console;
 import net.eduvax.dem.DiveSheet;
 import net.eduvax.dem.Diver;
 import net.eduvax.dem.Dive;
@@ -28,7 +30,8 @@ import net.eduvax.dem.Dive;
  *
  */
 public class DemHandler extends AbstractHandler implements Session.Observer {
-    public DemHandler(Session session) {
+    public DemHandler(Console console,Session session) {
+        _console=console;
         _session=session;
         _sessionJson=sessionToJson(session);
         _session.addObserver(this);
@@ -47,11 +50,17 @@ public class DemHandler extends AbstractHandler implements Session.Observer {
             }
             baseRequest.setHandled(true);
         }
-        else if (target.startsWith("/J&")) {
-            System.out.println("send note "+target);
-        }
-        else if (target.startsWith("/next")) {
-            System.out.println("next "+target);
+        else if (target.startsWith("/cmd&")) {
+            StringTokenizer st=new StringTokenizer(target,"&");
+            st.nextToken();
+            _console.runCommand(st.nextToken());
+            response.setContentType("text/json; charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+            PrintWriter out=response.getWriter();
+            synchronized(this) {
+                out.println("{\"cmd\":true}");
+            }
+            baseRequest.setHandled(true);
         }
     }
     public String sessionToJson(Session s) {
@@ -106,5 +115,6 @@ public class DemHandler extends AbstractHandler implements Session.Observer {
         }
     }
     private Session _session; 
+    private Console _console;
     private String _sessionJson;
 }

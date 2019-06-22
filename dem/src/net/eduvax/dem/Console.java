@@ -26,7 +26,7 @@ public class Console {
 			System.err.println("Exception "+ex+" "+ex.getMessage());
 			ex.printStackTrace();
         }
-		_ci=new CommandInterpretor();
+		_ci=new CommandInterpretor(this);
 	}
 	public void setPrompt(String prompt) {
 		_prompt=prompt;
@@ -40,7 +40,7 @@ public class Console {
 			return "";
 		}
 	}
-    public void runCommand(String strCmd) {
+    public synchronized void runCommand(String strCmd) {
         Runnable cmd=_ci.getCmd(strCmd);
         if (cmd!=null) {
             int round=_ci.getRound();

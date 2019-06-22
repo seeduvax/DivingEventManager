@@ -17,8 +17,8 @@
 <div class="board" id="detail">
 </div>
 <div class="command">
-<input id="J" type="text" onkeyup="if (event.keyCode==13) J();"/>
-<a href="#" onclick="next()">Next</a>
+<input id="cmd" type="text" onkeyup="if (event.keyCode==13) cmd();"/>
+<a href="#" onclick="next()" id="next">Next</a>
 </div>
 <div class="foot">
 </div>
@@ -112,16 +112,22 @@ function refreshSessionInfo() {
 	}
 	xhr.send();
 }
-function J() {
-	var xhr=new XMLHttpRequest();
-	xhr.open("GET","J&"+document.getElementById("J").value,true);
-	xhr.send();
+function cmd() {
+	var cte=document.getElementById("cmd");
+	if (cte.value!="") {
+		var xhr=new XMLHttpRequest();
+		xhr.open("GET","cmd&"+cte.value,true);
+		xhr.send();
+		document.getElementById("next").focus();
+	}
 }
 function next() {
 	var xhr=new XMLHttpRequest();
-	xhr.open("GET","next",true);
+	xhr.open("GET","cmd&n",true);
 	xhr.send();
-	document.getElementById("J").value="";
+	var cte=document.getElementById("cmd");
+	cte.value="";
+	cte.focus();
 }
 
 window.setInterval(refreshSessionInfo,1000);

@@ -8,6 +8,7 @@ import net.eduvax.dem.www.WebServer;
 
 public class CommandInterpretor {
     private static WebServer _webServer=null;
+    private Console _console;
     public class UIState {
         Session _session=null;
         DiveSheet _diveSheet=null;
@@ -140,7 +141,8 @@ return this;
     }
     private boolean _completed=false;
 	private Vector<ICommand> _cmd;
-	public CommandInterpretor() {
+	public CommandInterpretor(Console console) {
+        _console=console;
         _state._session=new Session("");
 		_cmd=new Vector<ICommand>();
         _cmd.add(new CNamedVectEntry<Session,DiveSheet>("cSheet",
@@ -259,7 +261,7 @@ return this;
                 public void run() {
                     if (_webServer==null) {
                         try {
-                            _webServer=new WebServer(8080,_state._session);
+                            _webServer=new WebServer(8080,_console,_state._session);
                             _webServer.start();
                         }
                         catch (Exception ex) {
