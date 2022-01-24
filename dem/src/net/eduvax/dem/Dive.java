@@ -89,6 +89,23 @@ public class Dive implements INamedObject {
         /* 630 */ {0,0,0.1,0,0.2,0,0.2,0,0.2,0},
         /* 640 */ {0,0.1,0,0.2,0,0.3,0,0.4,0,0.5}
         };
+
+    private static double specialDD(String code) {
+        if ("100A".equals(code)) return 1.0;
+        if ("100B".equals(code)) return 1.2;
+        if ("100C".equals(code)) return 1.1;
+        if ("200A".equals(code)) return 1.1;
+        if ("200B".equals(code)) return 1.3;
+        if ("200C".equals(code)) return 1.2;
+        if ("010A".equals(code)) return 1.2;
+        if ("010B".equals(code)) return 1.1;
+        if ("010C".equals(code)) return 1.0;
+        if ("020A".equals(code)) return 1.3;
+        if ("020B".equals(code)) return 1.2;
+        if ("020C".equals(code)) return 1.1;
+        return 0;
+    }
+
 	private String _code;
 	private double _diff;
 	private Vector<Double> _score;
@@ -105,6 +122,7 @@ public class Dive implements INamedObject {
         else if (h==10) {
             hIdx=2;
         }
+        _diff=specialDD(code);
         if (_diff==0) {
             _diff=getDD(hIdx);
         }

@@ -1,5 +1,8 @@
 package net.eduvax.dem;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -285,6 +288,35 @@ return this;
                     }
                 }
             });
+        _cmd.add(new Command("load") {
+                public void run() {
+                    String fileName=nextArg();
+                    try {
+                        BufferedReader in=new BufferedReader(new FileReader(fileName));
+                        String entry=in.readLine();
+                        while (entry!=null) {
+                            StringTokenizer st=new StringTokenizer(entry,",");
+                            String club=st.nextToken();
+                            String diverName=st.nextToken();
+                            String birth=st.nextToken();
+                            String cat=st.nextToken();
+                            DiveSheet sheet=new DiveSheet(new Diver(diverName,2000,club,Diver.Genre.MALE));
+System.out.println("// "+diverName);
+                            while (st.hasMoreTokens()) {
+                                String code=st.nextToken();
+                                Dive dive=new Dive(code,0,1);
+                                sheet.add(dive);
+System.out.println("// // "+dive);
+                            }
+                            _state._session.add(sheet);
+                            entry=in.readLine();
+                        }
+                    }
+                    catch (IOException ex) {
+                    }
+                    _state._session.notifyChange();
+                }
+            });
 	}
 	public Runnable getCmd(String s) {
 		String cmdStr=s.trim();
@@ -299,7 +331,7 @@ return this;
                 _completed=true;
             }
             if (res==null && !_completed) {
-                System.out.println("Unknomw command: "+cmdStr);
+                System.out.println("Unknown command: "+cmdStr);
             }
         }
 		return res;
