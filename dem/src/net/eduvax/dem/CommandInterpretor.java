@@ -295,20 +295,27 @@ return this;
                         BufferedReader in=new BufferedReader(new FileReader(fileName));
                         String entry=in.readLine();
                         while (entry!=null) {
-                            StringTokenizer st=new StringTokenizer(entry,",");
-                            String club=st.nextToken();
-                            String diverName=st.nextToken();
-                            String birth=st.nextToken();
-                            String cat=st.nextToken();
-                            DiveSheet sheet=new DiveSheet(new Diver(diverName,2000,club,Diver.Genre.MALE));
-System.out.println("// "+diverName);
-                            while (st.hasMoreTokens()) {
-                                String code=st.nextToken();
-                                Dive dive=new Dive(code,0,1);
-                                sheet.add(dive);
-System.out.println("// // "+dive);
+                            if (entry.charAt(0)!='#') {
+                                StringTokenizer st=new StringTokenizer(entry,",");
+                                st.nextToken(); // skip concours
+                                st.nextToken(); // skip order
+                                st.nextToken(); // skip category
+                                String genreStr=st.nextToken();
+                                Diver.Genre genre="M".equals(genreStr)?Diver.Genre.MALE:Diver.Genre.FEMAL;
+                                String diverName=st.nextToken()+" "+st.nextToken();
+                                String birth=st.nextToken();
+                                String club=st.nextToken();
+                                DiveSheet sheet=new DiveSheet(new Diver(diverName,Integer.parseInt(birth),club,genre));
+    System.out.println("// "+diverName);
+                                while (st.hasMoreTokens()) {
+                                    String code=st.nextToken();
+                                    double dd=Double.parseDouble(st.nextToken());
+                                    Dive dive=new Dive(code,dd,1);
+                                    sheet.add(dive);
+    System.out.println("// // "+dive);
+                                }
+                                _state._session.add(sheet);
                             }
-                            _state._session.add(sheet);
                             entry=in.readLine();
                         }
                     }

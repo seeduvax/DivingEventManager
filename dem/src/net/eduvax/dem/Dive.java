@@ -91,18 +91,18 @@ public class Dive implements INamedObject {
         };
 
     private static double specialDD(String code) {
-        if ("100A".equals(code)) return 1.0;
-        if ("100B".equals(code)) return 1.2;
-        if ("100C".equals(code)) return 1.1;
-        if ("200A".equals(code)) return 1.1;
-        if ("200B".equals(code)) return 1.3;
-        if ("200C".equals(code)) return 1.2;
-        if ("010A".equals(code)) return 1.2;
+        if ("100A".equals(code)) return 1.1;
+        if ("100B".equals(code)) return 1.3;
+        if ("100C".equals(code)) return 1.2;
+        if ("200A".equals(code)) return 1.2;
+        if ("200B".equals(code)) return 1.4;
+        if ("200C".equals(code)) return 1.3;
+        if ("010A".equals(code)) return 1.1;
         if ("010B".equals(code)) return 1.1;
-        if ("010C".equals(code)) return 1.0;
-        if ("020A".equals(code)) return 1.3;
+        if ("010C".equals(code)) return 1.1;
+        if ("020A".equals(code)) return 1.2;
         if ("020B".equals(code)) return 1.2;
-        if ("020C".equals(code)) return 1.1;
+        if ("020C".equals(code)) return 1.2;
         return 0;
     }
 
@@ -122,7 +122,6 @@ public class Dive implements INamedObject {
         else if (h==10) {
             hIdx=2;
         }
-        _diff=specialDD(code);
         if (_diff==0) {
             _diff=getDD(hIdx);
         }
@@ -167,6 +166,10 @@ public class Dive implements INamedObject {
         return (_code.charAt(0)<'5' && _code.charAt(1)=='1');
     }
     public double getDD(int high) {
+        double sdd=specialDD(_code);
+        if (sdd!=0) {
+            return sdd;
+        }
         int layout=getLayout();
         int ssault=getSomersault();
         int sens=getSens();
