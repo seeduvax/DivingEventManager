@@ -92,11 +92,11 @@ public class Dive implements INamedObject {
 
     private static double specialDD(String code) {
         if ("100A".equals(code)) return 1.1;
-        if ("100B".equals(code)) return 1.3;
-        if ("100C".equals(code)) return 1.2;
+        if ("100B".equals(code)) return 1.1;
+        if ("100C".equals(code)) return 1.1;
         if ("200A".equals(code)) return 1.2;
-        if ("200B".equals(code)) return 1.4;
-        if ("200C".equals(code)) return 1.3;
+        if ("200B".equals(code)) return 1.2;
+        if ("200C".equals(code)) return 1.2;
         if ("010A".equals(code)) return 1.1;
         if ("010B".equals(code)) return 1.1;
         if ("010C".equals(code)) return 1.1;

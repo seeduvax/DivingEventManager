@@ -296,21 +296,37 @@ return this;
                         String entry=in.readLine();
                         while (entry!=null) {
                             if (entry.charAt(0)!='#') {
-                                StringTokenizer st=new StringTokenizer(entry,",");
+                                StringTokenizer st=new StringTokenizer(entry,",;");
+                                st.nextToken(); // skip category
+                                int h=1;
+                                String hstr=st.nextToken();
+                                if ("3m".equals(hstr)) {
+                                    h=3;
+                                }
+                                else if ("5m".equals(hstr)) {
+                                    h=5;
+                                }
+                                else if ("10m".equals(hstr)) {
+                                    h=10;
+                                }
                                 st.nextToken(); // skip concours
                                 st.nextToken(); // skip order
-                                st.nextToken(); // skip category
+                                String diverName=st.nextToken();
                                 String genreStr=st.nextToken();
                                 Diver.Genre genre="M".equals(genreStr)?Diver.Genre.MALE:Diver.Genre.FEMAL;
-                                String diverName=st.nextToken()+" "+st.nextToken();
                                 String birth=st.nextToken();
+                                StringTokenizer yt=new StringTokenizer(birth,"/");
+                                int year=0;
+                                while (yt.hasMoreTokens()) {
+                                    year=Integer.parseInt(yt.nextToken());
+                                }
                                 String club=st.nextToken();
-                                DiveSheet sheet=new DiveSheet(new Diver(diverName,Integer.parseInt(birth),club,genre));
+                                DiveSheet sheet=new DiveSheet(new Diver(diverName,year,club,genre));
     System.out.println("// "+diverName);
                                 while (st.hasMoreTokens()) {
                                     String code=st.nextToken();
                                     double dd=Double.parseDouble(st.nextToken());
-                                    Dive dive=new Dive(code,dd,1);
+                                    Dive dive=new Dive(code,dd,h);
                                     sheet.add(dive);
     System.out.println("// // "+dive);
                                 }
