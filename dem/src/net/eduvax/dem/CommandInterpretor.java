@@ -320,6 +320,7 @@ return this;
                                 while (yt.hasMoreTokens()) {
                                     year=Integer.parseInt(yt.nextToken());
                                 }
+                                st.nextToken(); // skip licence
                                 String club=st.nextToken();
                                 DiveSheet sheet=new DiveSheet(new Diver(diverName,year,club,genre));
     System.out.println("// "+diverName);
